@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 )
 
@@ -14,51 +15,71 @@ const version = "1.0.0"
 const cssVersion = "1"
 
 type Config struct {
+	// app port
 	port int
-	env  string
-	api  string
-	db   struct {
+	//wether it is production or development
+	env string
+	api string
+	// Database connection details
+	db struct {
 		dsn string
 	}
+
+	// Stripe account details
 	stripe struct {
 		secret string
 		pubKey string
 	}
 }
 
+// This holds the entire application data, methods that powers rendering and app functionality
 type application struct {
-	config        Config
-	infoLog       *log.Logger
-	errorLog      *log.Logger
+	//Handles access to application config
+	config Config
+	// Information logging
+	infoLog *log.Logger
+	// error logging
+	errorLog *log.Logger
+
+	//Used to store templates that have been built
 	templateCache map[string]*template.Template
 	version       string
 }
 
 func (app *application) serve() error {
-	server := http.Server{
+	// normall to server app, we would do
+	/*
+		http.HandleFunc("/", nil)
+		http.ListenAndServe(":8060", nil)
+	*/
+
+	// but then http package provides more customizable option
+
+	serverConfig := http.Server{
 		Addr:              fmt.Sprintf(":%d", app.config.port),
-		Handler:           app.routes(),
 		ReadTimeout:       30 * time.Second,
 		IdleTimeout:       30 * time.Second,
 		ReadHeaderTimeout: 5 * time.Second,
 		WriteTimeout:      5 * time.Second,
+		Handler:           app.loadRoutes(),
 	}
 
 	app.infoLog.Printf("Starting HTTP server in %s mode on %d port \n", app.config.env, app.config.port)
 
-	return server.ListenAndServe()
+	return serverConfig.ListenAndServe()
 }
 
 func main() {
 	var appConfig Config
-	flag.IntVar(&appConfig.port, "port", 4000, "Server port to listen")
+	defaultPort := 4000
+	flag.IntVar(&appConfig.port, "port", defaultPort, "Server port to listen")
 	flag.StringVar(&appConfig.env, "env", "development", "application development environment {development | production}")
-	flag.StringVar(&appConfig.api, "api", "http://localhost:4001", "URL to api")
+	flag.StringVar(&appConfig.api, "api", "http://localhost:"+strconv.Itoa(defaultPort), "URL to api")
 
 	flag.Parse()
 
-	appConfig.stripe.pubKey = os.Getenv("STRIPE_KEY")
-	appConfig.stripe.secret = os.Getenv("STRIPE_SECRET_KEY")
+	appConfig.stripe.secret = os.Getenv("STRIPE_KEY")
+	appConfig.stripe.pubKey = os.Getenv("STRIPE_SECRET_KEY")
 
 	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
 	errorLog := log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
