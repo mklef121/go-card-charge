@@ -1,1 +1,3 @@
 tmp
+
+#nodemon --exec go run ./cmd/web --signal SIGTERM
