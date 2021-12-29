@@ -1,0 +1,23 @@
+{
+    "restartable": "rs",
+    "ignore": [
+      ".git",
+      "node_modules/**/node_modules",
+      "tmp"
+    ],
+    "verbose": true,
+    "execMap": {
+      "js": "node --harmony"
+    },
+    "events": {
+     
+    },
+  
+    "env": {
+      "NODE_ENV": "development",
+      "STRIPE_SECRET": "dev",
+       "STRIPE_KEY":"dev"
+    },
+    "ext": "js,json,go,tpl,tmpl,html,gohtml",
+    "signal":"SIGTERM"
+  }
