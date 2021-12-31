@@ -35,7 +35,7 @@ func (app *application) addDefaultTemplateData(td *templateData, request *http.R
 func (app *application) renderTemplate(writer http.ResponseWriter, request *http.Request, page string, td *templateData, partials ...string) (*template.Template, error) {
 	var templ *template.Template
 	var err error
-	var templateToRender = fmt.Sprintf("templates/%s.page.gohtml", page)
+	var templateToRender = fmt.Sprintf("templates/%s.page.html", page)
 
 	cacheTempl, templExists := app.templateCache[templateToRender]
 
@@ -72,16 +72,16 @@ func (app *application) parseTemplateAndPartials(partials []string, page string,
 
 	if len(partials) > 0 {
 		for index, data := range partials {
-			partials[index] = fmt.Sprintf("templates/%s.partial.gohtml", data)
+			partials[index] = fmt.Sprintf("templates/%s.partial.html", data)
 		}
 	}
 
-	var parseTmpls = []string{"templates/base.layout.gohtml", templPath}
+	var parseTmpls = []string{"templates/base.layout.html", templPath}
 	if len(partials) > 0 {
 		parseTmpls = append(parseTmpls, partials...)
-		templ, err = template.New(fmt.Sprintf("%s.page.gohtml", page)).Funcs(templateFunctions).ParseFS(templatesFs, parseTmpls...)
+		templ, err = template.New(fmt.Sprintf("%s.page.html", page)).Funcs(templateFunctions).ParseFS(templatesFs, parseTmpls...)
 	} else {
-		templ, err = template.New(fmt.Sprintf("%s.page.gohtml", page)).Funcs(templateFunctions).ParseFS(templatesFs, parseTmpls...)
+		templ, err = template.New(fmt.Sprintf("%s.page.html", page)).Funcs(templateFunctions).ParseFS(templatesFs, parseTmpls...)
 	}
 
 	if err != nil {
