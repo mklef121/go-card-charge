@@ -72,14 +72,15 @@ func (app *application) serve() error {
 func main() {
 	var appConfig Config
 	defaultPort := 4000
+	defaultApiPort := 4001
 	flag.IntVar(&appConfig.port, "port", defaultPort, "Server port to listen")
 	flag.StringVar(&appConfig.env, "env", "development", "application development environment {development | production}")
-	flag.StringVar(&appConfig.api, "api", "http://localhost:"+strconv.Itoa(defaultPort), "URL to api")
+	flag.StringVar(&appConfig.api, "api", "http://localhost:"+strconv.Itoa(defaultApiPort)+"/api/payment-intent", "URL to api")
 
 	flag.Parse()
 
-	appConfig.stripe.secret = os.Getenv("STRIPE_KEY")
-	appConfig.stripe.pubKey = os.Getenv("STRIPE_SECRET_KEY")
+	appConfig.stripe.secret = os.Getenv("STRIPE_SECRET_KEY")
+	appConfig.stripe.pubKey = os.Getenv("STRIPE_KEY")
 
 	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
 	errorLog := log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)

@@ -1,0 +1,19 @@
+{{template "layout" .}}
+
+{{define "title"}} Payment Successful {{end}}
+
+{{define "body"}}
+    <h2 class="mt-5">
+        Payment Succeeded
+    </h2>
+
+    <hr />
+
+
+       <p> Payment Intent: {{index .Data "paymentIntent"}} </p>
+        <p> Payment method: {{index .Data "paymentMethod"}}</p>
+         <p>Payment currency: {{index .Data "paymentCurrency"}}</p>
+         <p>Payment payment amount: {{index .Data "paymentAmount"}}</p>
+        <p> Card holder: {{index .Data "cardholder"}}</p>
+         <p>Email: {{index .Data "email"}}</p>
+{{end}}

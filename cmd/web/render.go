@@ -28,7 +28,7 @@ var templatesFs embed.FS
 
 //Adds all the default data neded for initial template rendering
 func (app *application) addDefaultTemplateData(td *templateData, request *http.Request) *templateData {
-
+	td.API = app.config.api
 	return td
 }
 

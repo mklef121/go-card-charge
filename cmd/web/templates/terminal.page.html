@@ -1,4 +1,4 @@
-{{template "layout"}}
+{{template "layout" .}}
 
 {{define "title"}} Virtual Terminal {{end}}
 {{define "body"}}
@@ -42,7 +42,7 @@
 
   <hr>
 
-  <a href="javascript:void(0)" id="pay-button" class="btn btn-primary" onclick="val()"> Charge Card</a>
+  <a href="javascript:void(0)" id="pay-button" class="btn btn-primary" onclick="submitPayment()"> Charge Card</a>
   <div id="processing-payment" class="text-center d-none">
     <div class="spinner-border text-primary" role="status">
       <span class="visually-hidden">
@@ -51,6 +51,10 @@
     </div>
   </div>
 
+  <input type="hidden" name="payment_intent" id="payment_intent" />
+  <input type="hidden" name="payment_amount" id="payment_amount" />
+  <input type="hidden" name="payment_method" id="payment_method" />
+  <input type="hidden" name="payment_currency" id="payment_currency" />
 </form>
 
 {{end}}
@@ -60,12 +64,12 @@
 
 <script>
   let card
-  let stripe = Stripe("pk_test_51K9EbQGqDIpyXgT2X3ajKjIGL9gHJJ4pLK6MOna1vNlohZkTezgYVch9zxTXndmhcSwgWxXoiJsTCF3KgUHJBEPO00W99eICd1")
+  let stripe = Stripe('{{index .StringMap "publishable_key" }}')
   const cardMessages = document.getElementById("card-messages");
   const payButton = document.getElementById("pay-button")
   const processing = document.getElementById("processing-payment")
 
-  function val(params) {
+  function submitPayment(params) {
     const payForm = document.getElementById("charge_form")
 
     if (!payForm.checkValidity()) {
@@ -80,6 +84,69 @@
 
     togglePayButton(true)
 
+    let amountToCharge = String(parseFloat(document.getElementById("amount").value * 100))
+
+    console.log(amountToCharge);
+
+    let payload = {
+      amount: amountToCharge,
+      currency: 'cad'
+    }
+
+    let requestOptions = {
+      method: "post",
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    }
+
+    fetch('{{index .API }}', requestOptions)
+      .then((response) => response.text())
+      .then((response) => {
+        let data;
+
+        try {
+          data = JSON.parse(response)
+          console.log(data);
+
+          if ('ok' in data && !data.ok) {
+            showCardError(data.message)
+            return
+          }
+
+          console.log("about starting stripe");
+          stripe.confirmCardPayment(data.client_secret, {
+            payment_method: {
+              card: card,
+              billing_details: {
+                name: document.getElementById("cardholder_name").value
+              }
+            }
+          }).then((result) => {
+            console.log("The charge result", result);
+            if (result.error) {
+              showCardError(result.error.message)
+            } else if (result.paymentIntent) {
+              if (result.paymentIntent.status == "succeeded") {
+                document.getElementById("payment_method").value = result.paymentIntent.payment_method;
+                document.getElementById("payment_intent").value = result.paymentIntent.id;
+                document.getElementById("payment_amount").value = result.paymentIntent.amount;
+                document.getElementById("payment_currency").value = result.paymentIntent.currency;
+
+                showCardSuccess();
+
+                document.getElementById("charge_form").submit()
+              }
+            }
+          })
+        } catch (error) {
+          console.log(error);
+          showCardError("Invalid response from payment gateway")
+        }
+      })
+
   }
 
   function togglePayButton(hide) {
@@ -91,6 +158,26 @@
       processing.classList.add("d-none")
     }
 
+  }
+
+  function showCardError(error) {
+    let alertDiv = document.getElementById("card-messages");
+    alertDiv.innerText = error;
+    alertDiv.classList.add("alert-danger");
+    alertDiv.classList.remove("alert-success")
+    alertDiv.classList.remove("d-none")
+
+    togglePayButton(false)
+  }
+
+  function showCardSuccess() {
+    let alertDiv = document.getElementById("card-messages");
+    alertDiv.innerText = "Transaction Successful";
+    alertDiv.classList.remove("alert-danger");
+    alertDiv.classList.add("alert-success")
+    alertDiv.classList.remove("d-none")
+
+    togglePayButton(false)
   }
 
   (function () {
