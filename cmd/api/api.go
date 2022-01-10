@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/mklef121/go-card-charge/driver"
 )
 
 const version = "1.0.0"
@@ -73,9 +75,18 @@ func main() {
 
 	appConfig.stripe.secret = os.Getenv("STRIPE_SECRET_KEY")
 	appConfig.stripe.pubKey = os.Getenv("STRIPE_KEY")
+	appConfig.db.dsn = os.Getenv("DATABASE_DSN")
 
 	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
 	errorLog := log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
+
+	db, err := driver.OpenDb(appConfig.db.dsn)
+
+	if err != nil {
+		errorLog.Fatal(err)
+		return
+	}
+	defer db.Close()
 
 	app := application{
 		config:   appConfig,
@@ -84,7 +95,7 @@ func main() {
 		version:  version,
 	}
 
-	err := app.serve()
+	err = app.serve()
 
 	if err != nil {
 		app.errorLog.Println(err)
