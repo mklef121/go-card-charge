@@ -7,7 +7,7 @@ import (
 func (app *application) VirtualTerminal(writer http.ResponseWriter, r *http.Request) {
 	stringMap := make(map[string]string)
 	stringMap["publishable_key"] = app.config.stripe.pubKey
-	if _, err := app.renderTemplate(writer, r, "terminal", &templateData{StringMap: stringMap}); err != nil {
+	if _, err := app.renderTemplate(writer, r, "terminal", &templateData{StringMap: stringMap}, "stripe-js"); err != nil {
 
 		app.errorLog.Println(err)
 	}
@@ -45,5 +45,14 @@ func (app *application) PaymentSucceeded(writer http.ResponseWriter, request *ht
 	if err != nil {
 		app.errorLog.Println(err)
 		return
+	}
+}
+
+//Displays the page to charge one widget
+func (app *application) ChargeOnce(writer http.ResponseWriter, request *http.Request) {
+	stringMap := make(map[string]string)
+	stringMap["publishable_key"] = app.config.stripe.pubKey
+	if _, err := app.renderTemplate(writer, request, "buy-once", &templateData{StringMap: stringMap}, "stripe-js"); err != nil {
+		app.errorLog.Println(err)
 	}
 }

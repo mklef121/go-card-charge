@@ -1,0 +1,153 @@
+{{define "stripe-js"}}
+<script src="https://js.stripe.com/v3/"></script>
+
+<script>
+  let card
+  let stripe = Stripe('{{index .StringMap "publishable_key" }}')
+  const cardMessages = document.getElementById("card-messages");
+  const payButton = document.getElementById("pay-button")
+  const processing = document.getElementById("processing-payment")
+
+  function submitPayment(params) {
+    const payForm = document.getElementById("charge_form")
+
+    if (!payForm.checkValidity()) {
+      this.event.preventDefault()
+      this.event.stopPropagation()
+      payForm.classList.add("was-validated")
+
+      return;
+    }
+
+    payForm.classList.add("was-validated")
+
+    togglePayButton(true)
+
+    let amountToCharge = String(parseFloat(document.getElementById("amount").value * 100))
+
+    console.log(amountToCharge);
+
+    let payload = {
+      amount: amountToCharge,
+      currency: 'cad'
+    }
+
+    let requestOptions = {
+      method: "post",
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    }
+
+    fetch('{{index .API }}', requestOptions)
+      .then((response) => response.text())
+      .then((response) => {
+        let data;
+
+        try {
+          data = JSON.parse(response)
+          console.log(data);
+
+          if ('ok' in data && !data.ok) {
+            showCardError(data.message)
+            return
+          }
+
+          console.log("about starting stripe");
+          stripe.confirmCardPayment(data.client_secret, {
+            payment_method: {
+              card: card,
+              billing_details: {
+                name: document.getElementById("cardholder_name").value
+              }
+            }
+          }).then((result) => {
+            console.log("The charge result", result);
+            if (result.error) {
+              showCardError(result.error.message)
+            } else if (result.paymentIntent) {
+              if (result.paymentIntent.status == "succeeded") {
+                document.getElementById("payment_method").value = result.paymentIntent.payment_method;
+                document.getElementById("payment_intent").value = result.paymentIntent.id;
+                document.getElementById("payment_amount").value = result.paymentIntent.amount;
+                document.getElementById("payment_currency").value = result.paymentIntent.currency;
+
+                showCardSuccess();
+
+                document.getElementById("charge_form").submit()
+              }
+            }
+          })
+        } catch (error) {
+          console.log(error);
+          showCardError("Invalid response from payment gateway")
+        }
+      })
+
+  }
+
+  function togglePayButton(hide) {
+    if (hide) {
+      payButton.classList.add("d-none")
+      processing.classList.remove("d-none")
+    } else {
+      payButton.classList.remove("d-none")
+      processing.classList.add("d-none")
+    }
+
+  }
+
+  function showCardError(error) {
+    let alertDiv = document.getElementById("card-messages");
+    alertDiv.innerText = error;
+    alertDiv.classList.add("alert-danger");
+    alertDiv.classList.remove("alert-success")
+    alertDiv.classList.remove("d-none")
+
+    togglePayButton(false)
+  }
+
+  function showCardSuccess() {
+    let alertDiv = document.getElementById("card-messages");
+    alertDiv.innerText = "Transaction Successful";
+    alertDiv.classList.remove("alert-danger");
+    alertDiv.classList.add("alert-success")
+    alertDiv.classList.remove("d-none")
+
+    togglePayButton(false)
+  }
+
+  (function () {
+    const elements = stripe.elements()
+    const style = {
+      base: {
+        fontSize: "16px",
+        lineHeight: "24px",
+
+      }
+    }
+
+    card = elements.create("card", {
+      style,
+      hidePostalCode: true
+    })
+
+    card.mount("#card-element")
+
+    card.addEventListener("change", (event) => {
+      var errorBlock = document.getElementById("card-errors")
+
+      if (event.error) {
+        errorBlock.classList.remove("d-none")
+        errorBlock.textContent = event.error.message
+      } else {
+        errorBlock.classList.add("d-none")
+        errorBlock.textContent = ""
+      }
+
+    })
+  })()
+</script>
+{{end}}
