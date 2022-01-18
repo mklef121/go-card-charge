@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/mklef121/go-card-charge/driver"
+	"github.com/mklef121/go-card-charge/internal/models"
 )
 
 const version = "1.0.0"
@@ -46,6 +47,7 @@ type application struct {
 	//Used to store templates that have been built
 	templateCache map[string]*template.Template
 	version       string
+	DB            models.DBModel
 }
 
 func (app *application) serve() error {
@@ -105,6 +107,7 @@ func main() {
 		errorLog:      errorLog,
 		templateCache: tc,
 		version:       version,
+		DB:            models.DBModel{DB: db},
 	}
 
 	err = app.serve()

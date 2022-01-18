@@ -1,3 +1,5 @@
 tmp
 
 #nodemon --exec go run ./cmd/web --signal SIGTERM
+#soda generate fizz AddImageToWidget
+#soda migrate

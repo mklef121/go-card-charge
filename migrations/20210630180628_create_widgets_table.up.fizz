@@ -1,0 +1,14 @@
+create_table("widgets") {
+    t.Column("id", "integer", {primary: true})
+    t.Column("name", "string", {"default": ""})
+    t.Column("description", "text", {"null": true})
+    t.Column("inventory_level", "integer", {})
+    t.Column("price", "integer", {})
+}
+
+sql("ALTER TABLE `widgets` MODIFY COLUMN `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;")
+sql("ALTER TABLE `widgets` MODIFY COLUMN `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;")
+sql("ALTER TABLE `widgets` MODIFY COLUMN `description` text NULL DEFAULT NULL;")
+
+
+sql("insert into widgets (name, description, inventory_level, price, created_at, updated_at) values ('Widget', 'A very nice widget.', 10, 1000, now(), now());")

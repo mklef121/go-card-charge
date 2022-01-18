@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/mklef121/go-card-charge/driver"
+	"github.com/mklef121/go-card-charge/internal/models"
 )
 
 const version = "1.0.0"
@@ -39,6 +40,7 @@ type application struct {
 	// error logging
 	errorLog *log.Logger
 	version  string
+	DB       models.DBModel
 }
 
 func (app *application) serve() error {
@@ -93,6 +95,7 @@ func main() {
 		infoLog:  infoLog,
 		errorLog: errorLog,
 		version:  version,
+		DB:       models.DBModel{DB: db},
 	}
 
 	err = app.serve()

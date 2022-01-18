@@ -2,12 +2,13 @@ package main
 
 import (
 	"net/http"
+
+	"github.com/mklef121/go-card-charge/internal/models"
 )
 
 func (app *application) VirtualTerminal(writer http.ResponseWriter, r *http.Request) {
-	stringMap := make(map[string]string)
-	stringMap["publishable_key"] = app.config.stripe.pubKey
-	if _, err := app.renderTemplate(writer, r, "terminal", &templateData{StringMap: stringMap}, "stripe-js"); err != nil {
+
+	if _, err := app.renderTemplate(writer, r, "terminal", &templateData{}, "stripe-js"); err != nil {
 
 		app.errorLog.Println(err)
 	}
@@ -50,9 +51,19 @@ func (app *application) PaymentSucceeded(writer http.ResponseWriter, request *ht
 
 //Displays the page to charge one widget
 func (app *application) ChargeOnce(writer http.ResponseWriter, request *http.Request) {
-	stringMap := make(map[string]string)
-	stringMap["publishable_key"] = app.config.stripe.pubKey
-	if _, err := app.renderTemplate(writer, request, "buy-once", &templateData{StringMap: stringMap}, "stripe-js"); err != nil {
+
+	widget := models.Widget{
+		ID:             1,
+		Name:           "Custom Widget",
+		Description:    "A very nice widget",
+		InventoryLevel: 10,
+		Price:          1000,
+	}
+
+	data := make(map[string]interface{})
+	data["widget"] = widget
+
+	if _, err := app.renderTemplate(writer, request, "buy-once", &templateData{Data: data}, "stripe-js"); err != nil {
 		app.errorLog.Println(err)
 	}
 }

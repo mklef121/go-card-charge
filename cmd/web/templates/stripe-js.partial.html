@@ -3,7 +3,7 @@
 
 <script>
   let card
-  let stripe = Stripe('{{index .StringMap "publishable_key" }}')
+  let stripe = Stripe('{{.StripePublishableKey}}')
   const cardMessages = document.getElementById("card-messages");
   const payButton = document.getElementById("pay-button")
   const processing = document.getElementById("processing-payment")
@@ -41,7 +41,7 @@
       body: JSON.stringify(payload)
     }
 
-    fetch('{{index .API }}', requestOptions)
+    fetch('{{ .API }}', requestOptions)
       .then((response) => response.text())
       .then((response) => {
         let data;
