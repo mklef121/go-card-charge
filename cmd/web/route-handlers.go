@@ -8,6 +8,15 @@ import (
 	"github.com/mklef121/go-card-charge/internal/cards"
 )
 
+func (app *application) HomePage(writer http.ResponseWriter, r *http.Request) {
+
+	if _, err := app.renderTemplate(writer, r, "home", &templateData{}); err != nil {
+
+		app.errorLog.Println(err)
+	}
+
+}
+
 func (app *application) VirtualTerminal(writer http.ResponseWriter, r *http.Request) {
 
 	if _, err := app.renderTemplate(writer, r, "terminal", &templateData{}, "stripe-js"); err != nil {
@@ -58,6 +67,9 @@ func (app *application) PaymentSucceeded(writer http.ResponseWriter, request *ht
 	expiryMonth := pm.Card.ExpMonth
 	expiryYear := pm.Card.ExpYear
 
+	//Create a new customer
+	// create a new transaction
+	// create a new order
 	uiData := make(map[string]interface{})
 	uiData["cardholder"] = cardHolder
 	uiData["email"] = cardHolderEmail

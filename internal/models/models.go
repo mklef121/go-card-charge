@@ -68,6 +68,8 @@ type Transaction struct {
 	Amount              int       `json:"amount"`
 	Currency            string    `json:"currency"`
 	LastFour            string    `json:"last_four"`
+	ExpiryMonth         int       `json:"expiry_month"`
+	ExpiryYear          int       `json:"expiry_year"`
 	BankReturnCode      string    `json:"bank_return_code"`
 	CreatedAt           time.Time `json:"-"`
 	UpdatedAt           time.Time `json:"-"`
@@ -148,6 +150,8 @@ func (model *DBModel) InsertTransaction(txn Transaction) (int, error) {
 		currency,
 		last_four,
 		bank_return_code,
+		expiry_month,
+		expiry_year,
 		created_at,
 		updated_at
 	) values ( ?, ?, ?, ?, ?, ?, ?,)`
@@ -159,6 +163,8 @@ func (model *DBModel) InsertTransaction(txn Transaction) (int, error) {
 		txn.Currency,
 		txn.LastFour,
 		txn.BankReturnCode,
+		txn.ExpiryMonth,
+		txn.ExpiryYear,
 		time.Now(),
 		time.Now())
 
@@ -195,6 +201,38 @@ func (model *DBModel) InsertOrder(order Order) (int, error) {
 		order.StatusID,
 		order.Quantity,
 		order.Amount,
+		time.Now(),
+		time.Now())
+
+	if err != nil {
+		return 0, err
+	}
+
+	lastId, err := result.LastInsertId()
+	if err != nil {
+		return 0, err
+	}
+
+	return int(lastId), nil
+}
+
+func (model *DBModel) InsertCustomer(cus Customer) (int, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	stm := `insert into customers (
+		first_name,
+		last_name,
+		email,
+		created_at,
+		updated_at
+	) values ( ?, ?, ?, ?, ?)`
+
+	result, err := model.DB.ExecContext(ctx,
+		stm,
+		cus.FirstName,
+		cus.LastName,
+		cus.Email,
 		time.Now(),
 		time.Now())
 

@@ -10,6 +10,9 @@ func (app *application) loadRoutes() http.Handler {
 
 	router := chi.NewRouter()
 
+	router.Use(SessionLoad)
+
+	router.Get("/", app.HomePage)
 	router.Get("/virtual-terminal", app.VirtualTerminal)
 	router.Post("/paymet-succeeded", app.PaymentSucceeded)
 	router.Get("/widgets/{id}/charge-once", app.ChargeOnce)

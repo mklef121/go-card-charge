@@ -10,12 +10,15 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/alexedwards/scs/v2"
 	"github.com/mklef121/go-card-charge/driver"
 	"github.com/mklef121/go-card-charge/internal/models"
 )
 
 const version = "1.0.0"
 const cssVersion = "1"
+
+var sessionManager *scs.SessionManager
 
 type Config struct {
 	// app port
@@ -48,6 +51,7 @@ type application struct {
 	templateCache map[string]*template.Template
 	version       string
 	DB            models.DBModel
+	session       *scs.SessionManager
 }
 
 func (app *application) serve() error {
@@ -99,6 +103,10 @@ func main() {
 	}
 	defer db.Close()
 
+	// Initialize a new session manager and configure the session lifetime.
+	sessionManager = scs.New()
+	sessionManager.Lifetime = 24 * time.Hour
+
 	tc := make(map[string]*template.Template)
 
 	app := application{
@@ -108,6 +116,7 @@ func main() {
 		templateCache: tc,
 		version:       version,
 		DB:            models.DBModel{DB: db},
+		session:       sessionManager,
 	}
 
 	err = app.serve()
