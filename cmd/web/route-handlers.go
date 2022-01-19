@@ -2,8 +2,10 @@ package main
 
 import (
 	"net/http"
+	"strconv"
 
-	"github.com/mklef121/go-card-charge/internal/models"
+	"github.com/go-chi/chi/v5"
+	"github.com/mklef121/go-card-charge/internal/cards"
 )
 
 func (app *application) VirtualTerminal(writer http.ResponseWriter, r *http.Request) {
@@ -33,6 +35,29 @@ func (app *application) PaymentSucceeded(writer http.ResponseWriter, request *ht
 	paymentAmount := request.Form.Get("payment_amount")
 	paymentCurrency := request.Form.Get("payment_currency")
 
+	card := cards.Card{
+		Secret: app.config.stripe.secret,
+		Key:    app.config.stripe.pubKey,
+	}
+
+	pi, err := card.RetrieveExistingPaymentIntent(paymentIntent)
+
+	if err != nil {
+		app.errorLog.Println(err)
+		return
+	}
+
+	pm, err := card.GetPaymentMethod(paymentMethod)
+
+	if err != nil {
+		app.errorLog.Println(err)
+		return
+	}
+
+	lastFour := pm.Card.Last4
+	expiryMonth := pm.Card.ExpMonth
+	expiryYear := pm.Card.ExpYear
+
 	uiData := make(map[string]interface{})
 	uiData["cardholder"] = cardHolder
 	uiData["email"] = cardHolderEmail
@@ -40,6 +65,10 @@ func (app *application) PaymentSucceeded(writer http.ResponseWriter, request *ht
 	uiData["paymentMethod"] = paymentMethod
 	uiData["paymentCurrency"] = paymentCurrency
 	uiData["paymentAmount"] = paymentAmount
+	uiData["lastFour"] = lastFour
+	uiData["expiryMonth"] = expiryMonth
+	uiData["expiryYear"] = expiryYear
+	uiData["bankReturnCode"] = pi.Charges.Data[0].ID
 
 	// fmt.Println(uiData)
 	_, err = app.renderTemplate(writer, request, "succeeded", &templateData{Data: uiData})
@@ -51,13 +80,14 @@ func (app *application) PaymentSucceeded(writer http.ResponseWriter, request *ht
 
 //Displays the page to charge one widget
 func (app *application) ChargeOnce(writer http.ResponseWriter, request *http.Request) {
+	id := chi.URLParam(request, "id")
+	widgetId, _ := strconv.Atoi(id)
 
-	widget := models.Widget{
-		ID:             1,
-		Name:           "Custom Widget",
-		Description:    "A very nice widget",
-		InventoryLevel: 10,
-		Price:          1000,
+	widget, err := app.DB.GetWidget(widgetId)
+
+	if err != nil {
+		app.errorLog.Println(err)
+		return
 	}
 
 	data := make(map[string]interface{})

@@ -14,8 +14,8 @@
   autocomplete="off" novalidate="">
 
   <div class="mb-3">
-    <label for="amount" class="form-label"> Amount</label>
-    <input type="number" id="amount" class="form-control" autocomplete="amount-new" name="amount" required />
+    <label for="charge_amount" class="form-label"> Amount</label>
+    <input type="number" id="charge_amount" class="form-control" autocomplete="charge_amount-new" name="charge_amount" required />
   </div>
 
 
@@ -51,6 +51,7 @@
     </div>
   </div>
 
+  <input type="hidden" name="amount" id="amount" />
   <input type="hidden" name="payment_intent" id="payment_intent" />
   <input type="hidden" name="payment_amount" id="payment_amount" />
   <input type="hidden" name="payment_method" id="payment_method" />
@@ -60,5 +61,18 @@
 {{end}}
 
 {{define "js"}}
+
+<script>
+  
+  document.getElementById("charge_amount").addEventListener("change",(event)=>{
+    console.log(event);
+
+    if(event.target.value !== ""){
+      document.getElementById("amount").value  =  String(parseFloat(event.target.value * 100))
+    }else{
+      document.getElementById("amount").value = 0;
+    }
+  })
+</script>
  {{template "stripe-js" .}}
 {{end}}

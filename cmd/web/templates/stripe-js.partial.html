@@ -23,7 +23,8 @@
 
     togglePayButton(true)
 
-    let amountToCharge = String(parseFloat(document.getElementById("amount").value * 100))
+    let amountToCharge = document.getElementById("amount").value 
+    // String(parseFloat(document.getElementById("amount").value * 100))
 
     console.log(amountToCharge);
 

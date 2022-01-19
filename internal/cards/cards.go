@@ -3,6 +3,7 @@ package cards
 import (
 	"github.com/stripe/stripe-go/v72"
 	"github.com/stripe/stripe-go/v72/paymentintent"
+	"github.com/stripe/stripe-go/v72/paymentmethod"
 )
 
 type Card struct {
@@ -71,4 +72,30 @@ func cardErrorMessage(code stripe.ErrorCode) string {
 		msg = "Your card was declined"
 	}
 	return msg
+}
+
+//Gets the payment method by payment intent id
+func (card *Card) GetPaymentMethod(id string) (*stripe.PaymentMethod, error) {
+	stripe.Key = card.Secret
+
+	pm, err := paymentmethod.Get(id, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return pm, nil
+}
+
+//Gets an existing payment intent by ID
+func (card *Card) RetrieveExistingPaymentIntent(id string) (*stripe.PaymentIntent, error) {
+	stripe.Key = card.Secret
+
+	pi, err := paymentintent.Get(id, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return pi, nil
 }
