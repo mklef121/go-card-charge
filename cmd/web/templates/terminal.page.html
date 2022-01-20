@@ -10,7 +10,7 @@
 
 </div>
 
-<form method="post" action="/paymet-succeeded" id="charge_form" class="d-block needs-validation charge-form"
+<form method="post" action="/virtual-terminal-payment-succeeded" id="charge_form" class="d-block needs-validation charge-form"
   autocomplete="off" novalidate="">
 
   <div class="mb-3">
@@ -62,7 +62,7 @@
     </div>
   </div>
 
-  <input type="hidden" name="amount" id="amount" />
+  <input type="text" name="amount" id="amount" />
   <input type="hidden" name="payment_intent" id="payment_intent" />
   <input type="hidden" name="payment_amount" id="payment_amount" />
   <input type="hidden" name="payment_method" id="payment_method" />
@@ -79,7 +79,7 @@
     console.log(event);
 
     if(event.target.value !== ""){
-      document.getElementById("amount").value  =  String(parseFloat(event.target.value * 100))
+      document.getElementById("amount").value  =  String(parseInt(event.target.value * 100, 10))
     }else{
       document.getElementById("amount").value = 0;
     }

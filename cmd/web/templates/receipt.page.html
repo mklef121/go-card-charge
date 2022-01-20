@@ -1,0 +1,22 @@
+{{template "layout" .}}
+
+{{define "title"}} Payment Successful {{end}}
+
+{{define "body"}}
+<h2 class="mt-5">
+    Payment Succeeded
+</h2>
+
+<hr />
+
+{{$tranXn := index .Data "txn"}}
+<p> Payment Intent: {{$tranXn.PaymentIntentID}} </p>
+<p> Payment method: {{$tranXn.PaymentMethod}}</p>
+<p>Payment currency: {{$tranXn.PaymentCurrency}}</p>
+<p>Payment payment amount: {{$tranXn.PaymentAmount}}</p>
+<p> Name: {{$tranXn.FirstName}} {{$tranXn.LastName}}</p>
+<p>Email: {{$tranXn.Email}}</p> 
+<p>Last Four: {{$tranXn.LastFour}}</p>
+<p>Bank Return Code: {{$tranXn.BankReturnCode}}</p>
+<p>Expiry Date: {{$tranXn.ExpiryMonth}} / {{$tranXn.ExpiryYear}}</p>
+{{end}}

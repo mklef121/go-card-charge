@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/gob"
 	"flag"
 	"fmt"
 	"html/template"
@@ -78,6 +79,7 @@ func (app *application) serve() error {
 }
 
 func main() {
+	gob.Register(TransactionData{})
 	var appConfig Config
 	defaultPort := 4000
 	defaultApiPort := 4001
