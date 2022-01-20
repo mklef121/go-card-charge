@@ -71,6 +71,8 @@ type Transaction struct {
 	ExpiryMonth         int       `json:"expiry_month"`
 	ExpiryYear          int       `json:"expiry_year"`
 	BankReturnCode      string    `json:"bank_return_code"`
+	PaymentIntent       string    `json:"payment_intent"`
+	PaymentMethod       string    `json:"payment_method"`
 	CreatedAt           time.Time `json:"-"`
 	UpdatedAt           time.Time `json:"-"`
 }
@@ -152,9 +154,11 @@ func (model *DBModel) InsertTransaction(txn Transaction) (int, error) {
 		bank_return_code,
 		expiry_month,
 		expiry_year,
+		payment_intent,
+		payment_method,
 		created_at,
 		updated_at
-	) values ( ?, ?, ?, ?, ?, ?, ?,)`
+	) values ( ?, ?, ?, ?, ?, ?, ?,?, ?,?,?)`
 
 	result, err := model.DB.ExecContext(ctx,
 		stm,
@@ -165,6 +169,8 @@ func (model *DBModel) InsertTransaction(txn Transaction) (int, error) {
 		txn.BankReturnCode,
 		txn.ExpiryMonth,
 		txn.ExpiryYear,
+		txn.PaymentIntent,
+		txn.PaymentMethod,
 		time.Now(),
 		time.Now())
 
@@ -190,9 +196,10 @@ func (model *DBModel) InsertOrder(order Order) (int, error) {
 		status_id,
 		quantity,
 		amount,
+		customer_id,
 		created_at,
 		updated_at
-	) values ( ?, ?, ?, ?, ?, ?, ?,)`
+	) values ( ?, ?, ?, ?, ?, ?, ?,?)`
 
 	result, err := model.DB.ExecContext(ctx,
 		stm,
@@ -201,6 +208,7 @@ func (model *DBModel) InsertOrder(order Order) (int, error) {
 		order.StatusID,
 		order.Quantity,
 		order.Amount,
+		order.CustomerID,
 		time.Now(),
 		time.Now())
 

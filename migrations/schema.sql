@@ -125,6 +125,8 @@ CREATE TABLE `transactions` (
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `expiry_month` int NOT NULL DEFAULT '0',
   `expiry_year` int NOT NULL DEFAULT '0',
+  `payment_intent` varchar(255) NOT NULL DEFAULT '',
+  `payment_method` varchar(255) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
   KEY `transactions_transaction_statuses_id_fk` (`transaction_status_id`),
   CONSTRAINT `transactions_transaction_statuses_id_fk` FOREIGN KEY (`transaction_status_id`) REFERENCES `transaction_statuses` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
@@ -179,4 +181,4 @@ CREATE TABLE `widgets` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-01-19 23:42:53
+-- Dump completed on 2022-01-20  9:36:45
