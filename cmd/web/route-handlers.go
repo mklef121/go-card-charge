@@ -284,3 +284,23 @@ func (app *application) SaveOrder(order models.Order) (int, error) {
 
 	return id, nil
 }
+
+func (app *application) GoldPlan(writer http.ResponseWriter, request *http.Request) {
+
+	widget, err := app.DB.GetWidget(2)
+
+	if err != nil {
+		app.errorLog.Println(err)
+		return
+	}
+
+	dataMap := make(map[string]interface{})
+
+	dataMap["widget"] = widget
+
+	_, err = app.renderTemplate(writer, request, "gold-plan", &templateData{Data: dataMap})
+	if err != nil {
+		app.errorLog.Println(err)
+		return
+	}
+}

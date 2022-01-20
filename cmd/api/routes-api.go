@@ -24,6 +24,7 @@ func (app *application) loadApiRoutes() http.Handler {
 	router.Route("/api", func(chiRouter chi.Router) {
 		chiRouter.Post("/payment-intent", app.GetPaymentIntent)
 		chiRouter.Get("/widgets/{id}", app.GetWidgetById)
+		chiRouter.Post("/create-customer-and-subscribe", app.CreateCustomerAndSubscribe)
 
 	})
 

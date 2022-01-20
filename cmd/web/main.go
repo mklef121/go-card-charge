@@ -85,7 +85,7 @@ func main() {
 	defaultApiPort := 4001
 	flag.IntVar(&appConfig.port, "port", defaultPort, "Server port to listen")
 	flag.StringVar(&appConfig.env, "env", "development", "application development environment {development | production}")
-	flag.StringVar(&appConfig.api, "api", "http://localhost:"+strconv.Itoa(defaultApiPort)+"/api/payment-intent", "URL to api")
+	flag.StringVar(&appConfig.api, "api", "http://localhost:"+strconv.Itoa(defaultApiPort)+"/api", "URL to api")
 
 	flag.Parse()
 

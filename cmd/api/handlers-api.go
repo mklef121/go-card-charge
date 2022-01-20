@@ -10,8 +10,11 @@ import (
 )
 
 type stripePayload struct {
-	Currency string `json:"currency"`
-	Amount   string `json:"amount"`
+	Currency      string `json:"currency"`
+	Amount        string `json:"amount"`
+	PaymentMethod string `json:"payment_method"`
+	Plan          string `json:"plan"`
+	LastFour      string `json:"last_four"`
 }
 
 type jsonResponse struct {
@@ -101,4 +104,36 @@ func (app *application) GetWidgetById(writer http.ResponseWriter, request *http.
 
 	writer.Header().Set("Content-Type", "application/json")
 	writer.Write(out)
+}
+
+func (app *application) CreateCustomerAndSubscribe(writer http.ResponseWriter, request *http.Request) {
+	var payload stripePayload
+	// request.Response.Body
+	err := json.NewDecoder(request.Body).Decode(&payload)
+
+	if err != nil {
+		app.errorLog.Println(err)
+		return
+	}
+
+	app.infoLog.Println(payload)
+
+	okay := true
+	msg := ""
+
+	respo := jsonResponse{
+		OK:      okay,
+		Message: msg,
+	}
+
+	out, err := json.MarshalIndent(respo, "", "  ")
+
+	if err != nil {
+		app.errorLog.Println(err)
+		return
+	}
+
+	writer.Header().Set("Content-Type", "application/json")
+	writer.Write(out)
+
 }

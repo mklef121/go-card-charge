@@ -42,7 +42,7 @@
       body: JSON.stringify(payload)
     }
 
-    fetch('{{ .API }}', requestOptions)
+    fetch('{{ .API }}/payment-intent', requestOptions)
       .then((response) => response.text())
       .then((response) => {
         let data;
