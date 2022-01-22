@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -276,4 +277,61 @@ func (app *application) SaveOrder(order models.Order) (int, error) {
 	}
 
 	return id, nil
+}
+
+func (app *application) AuthenticateUser(writer http.ResponseWriter, request *http.Request) {
+	var userInput struct {
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	}
+
+	err := app.readJson(writer, request, &userInput)
+
+	if err != nil {
+		app.badRequest(writer, err)
+		return
+	}
+
+	//Get user from db, send error if email is invalid
+	user, err := app.DB.GetUserByEmail(userInput.Email)
+	if err != nil {
+		app.invalidCredentials(writer)
+		return
+	}
+
+	//validate password
+
+	validPass, err := app.passwordMatches(userInput.Password, user.Password)
+
+	if err != nil || !validPass {
+		app.invalidCredentials(writer)
+		return
+	}
+
+	//generate token
+
+	token, err := models.GenerateToken(user.ID, 24*time.Hour, models.ScopeAuthentication)
+
+	if err != nil {
+		app.badRequest(writer, err)
+		return
+	}
+
+	err = app.DB.InsertToken(token, user)
+
+	if err != nil {
+		app.badRequest(writer, err)
+		return
+	}
+	//send response
+
+	var payload ApiMessage
+
+	payload.Error = false
+	payload.Message = fmt.Sprintf("token for %s created", user.Email)
+	payload.Token = token
+
+	fmt.Println("The token", token, string(token.PlainText))
+
+	app.writeJson(writer, http.StatusOK, payload)
 }

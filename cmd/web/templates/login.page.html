@@ -1,0 +1,122 @@
+{{template "layout" .}}
+
+{{define "title"}} Login {{end}}
+
+{{define "body"}}
+<form method="post" action="" id="login_form" class="d-block needs-validation charge-form" autocomplete="off"
+    novalidate="">
+
+
+
+    <h3 class="mt-2 mb-3 text-center text-primary">Login</h3>
+
+    <hr />
+
+    <div class="alert alert-danger text-center d-none" id="card-messages">
+
+    </div>
+
+
+    <div class="mb-3">
+        <label for="email" class="form-label text-primary"> Email</label>
+        <input type="email" id="email" class="form-control" autocomplete="email-new" name="email" required />
+    </div>
+
+    <div class="mb-3">
+        <label for="password" class="form-label text-primary"> Password</label>
+        <input type="password" id="password" class="form-control" autocomplete="password-new" name="cardholder_name"
+            required />
+    </div>
+
+
+
+
+    <a href="javascript:void(0)" id="login-button" class="btn btn-primary" onclick="submitLogin()"> Login</a>
+    <div id="processing-payment" class="text-center d-none">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">
+                loading ...
+            </span>
+        </div>
+    </div>
+
+</form>
+{{end}}
+
+
+{{define "js"}}
+<script>
+
+    const cardMessages = document.getElementById("card-messages");
+    const submitButton = document.getElementById("login-button")
+    const processing = document.getElementById("processing-payment")
+
+    function toggleSubmitButton(hide) {
+        if (hide) {
+            submitButton.classList.add("d-none")
+            processing.classList.remove("d-none")
+        } else {
+            submitButton.classList.remove("d-none")
+            processing.classList.add("d-none")
+        }
+
+    }
+
+    function showCardError(error) {
+        let alertDiv = document.getElementById("card-messages");
+        alertDiv.innerText = error;
+        alertDiv.classList.add("alert-danger");
+        alertDiv.classList.remove("alert-success")
+        alertDiv.classList.remove("d-none")
+
+        toggleSubmitButton(false)
+    }
+
+    function showCardSuccess() {
+        let alertDiv = document.getElementById("card-messages");
+        alertDiv.innerText = "Transaction Successful";
+        alertDiv.classList.remove("alert-danger");
+        alertDiv.classList.add("alert-success")
+        alertDiv.classList.remove("d-none")
+
+        toggleSubmitButton(false)
+    }
+
+
+    function submitLogin() {
+        const loginForm = document.getElementById("login_form")
+
+        if (!loginForm.checkValidity()) {
+            this.event.preventDefault()
+            this.event.stopPropagation()
+            loginForm.classList.add("was-validated")
+
+            return;
+        }
+
+        loginForm.classList.add("was-validated")
+
+        toggleSubmitButton(true)
+
+        let payload = {
+            email: document.getElementById("email").value,
+            password: document.getElementById("password").value,
+        }
+
+        let requestOptions = {
+        method: "post",
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      }
+
+      fetch('{{ .API }}/authenticate', requestOptions)
+      .then((response) => response.json())
+      .then((response) => {
+          console.log(response);
+      })
+    }
+</script>
+{{end}}

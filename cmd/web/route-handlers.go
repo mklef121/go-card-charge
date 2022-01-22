@@ -313,3 +313,12 @@ func (app *application) GoldPlan(writer http.ResponseWriter, request *http.Reque
 		return
 	}
 }
+
+func (app *application) LoginPage(writer http.ResponseWriter, request *http.Request) {
+
+	_, err := app.renderTemplate(writer, request, "login", nil)
+	if err != nil {
+		app.errorLog.Println(err)
+		return
+	}
+}

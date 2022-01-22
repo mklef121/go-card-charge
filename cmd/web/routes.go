@@ -25,6 +25,9 @@ func (app *application) loadRoutes() http.Handler {
 	router.Get("/plans/gold", app.GoldPlan)
 	router.Get("/receipt/gold-plan", app.GoldPlanReceipt)
 
+	//Auth pages
+	router.Get("/login", app.LoginPage)
+
 	fileServer := http.FileServer(http.Dir("./static"))
 
 	router.Handle("/static/*", http.StripPrefix("/static", fileServer))
