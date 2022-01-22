@@ -222,6 +222,15 @@ func (app *application) Receipt(writer http.ResponseWriter, request *http.Reques
 	}
 }
 
+func (app *application) GoldPlanReceipt(writer http.ResponseWriter, request *http.Request) {
+
+	_, err := app.renderTemplate(writer, request, "receipt-plan", nil)
+	if err != nil {
+		app.errorLog.Println(err)
+		return
+	}
+}
+
 //Displays the page to charge one widget
 func (app *application) ChargeOnce(writer http.ResponseWriter, request *http.Request) {
 	id := chi.URLParam(request, "id")

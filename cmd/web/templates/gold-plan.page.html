@@ -18,7 +18,7 @@ Gold Plan
 <form method="post" action="/payment-succeeded" id="charge_form" class="d-block needs-validation charge-form"
   autocomplete="off" novalidate="">
 
-  <input type="hidden" name="product_id" value="{{$widget.ID}}" />
+  <input type="hidden" name="product_id" id="product_id" value="{{$widget.ID}}" />
   <input type="hidden" name="amount" id="amount" value="{{$widget.Price}}" />
 
   <!-- <div class="mb-3">
@@ -195,10 +195,17 @@ Gold Plan
     } else {
       //create a customer and subscribe to plan
       let payload = {
+        product_id: document.getElementById("product_id").value,
         plan: '{{$widget.StripePlanID}}',
         payment_method: result.paymentMethod.id,
         email: document.getElementById("cardholder_email").value,
-        last_four: result.paymentMethod.card.last4
+        last_four: result.paymentMethod.card.last4,
+        card_brand: result.paymentMethod.card.brand,
+        expiry_month: result.paymentMethod.card.exp_month,
+        expiry_year: result.paymentMethod.card.exp_year,
+        first_name: document.getElementById("first_name").value,
+        last_name: document.getElementById("last_name").value,
+        amount: document.getElementById("amount").value
       }
 
       let requestOptions = {
@@ -213,6 +220,17 @@ Gold Plan
       fetch('{{ .API }}/create-customer-and-subscribe', requestOptions)
       .then((response) => response.json())
       .then((response) => {
+        if(response.ok){
+          showCardSuccess(response.message)
+          sessionStorage.setItem("first_name", document.getElementById("first_name").value);
+          sessionStorage.setItem("last_name", document.getElementById("last_name").value);
+          sessionStorage.setItem("amount", "{{formatCurrency $widget.Price}}")
+          sessionStorage.setItem("last_four", result.paymentMethod.card.last4);
+
+          location.href="/receipt/gold-plan"
+        }else{
+          showCardError(response.message)
+        }
         console.log(response);
       })
 

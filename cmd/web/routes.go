@@ -23,6 +23,7 @@ func (app *application) loadRoutes() http.Handler {
 	router.Get("/receipt", app.Receipt)
 
 	router.Get("/plans/gold", app.GoldPlan)
+	router.Get("/receipt/gold-plan", app.GoldPlanReceipt)
 
 	fileServer := http.FileServer(http.Dir("./static"))
 
