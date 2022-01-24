@@ -26,6 +26,7 @@ func (app *application) loadApiRoutes() http.Handler {
 		chiRouter.Get("/widgets/{id}", app.GetWidgetById)
 		chiRouter.Post("/create-customer-and-subscribe", app.CreateCustomerAndSubscribe)
 		chiRouter.Post("/authenticate", app.AuthenticateUser)
+		chiRouter.Post("/is-authenticated", app.CheckAuthentication)
 
 	})
 

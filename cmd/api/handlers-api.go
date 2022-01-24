@@ -335,3 +335,9 @@ func (app *application) AuthenticateUser(writer http.ResponseWriter, request *ht
 
 	app.writeJson(writer, http.StatusOK, payload)
 }
+
+func (app *application) CheckAuthentication(writer http.ResponseWriter, request *http.Request) {
+
+	app.invalidCredentials(writer)
+
+}

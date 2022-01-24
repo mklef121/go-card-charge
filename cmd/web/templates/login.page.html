@@ -12,7 +12,7 @@
 
     <hr />
 
-    <div class="alert alert-danger text-center d-none" id="card-messages">
+    <div class="alert alert-danger text-center d-none" id="error-messages">
 
     </div>
 
@@ -47,7 +47,7 @@
 {{define "js"}}
 <script>
 
-    const cardMessages = document.getElementById("card-messages");
+    const cardMessages = document.getElementById("error-messages");
     const submitButton = document.getElementById("login-button")
     const processing = document.getElementById("processing-payment")
 
@@ -63,7 +63,7 @@
     }
 
     function showCardError(error) {
-        let alertDiv = document.getElementById("card-messages");
+        let alertDiv = document.getElementById("error-messages");
         alertDiv.innerText = error;
         alertDiv.classList.add("alert-danger");
         alertDiv.classList.remove("alert-success")
@@ -73,8 +73,8 @@
     }
 
     function showCardSuccess() {
-        let alertDiv = document.getElementById("card-messages");
-        alertDiv.innerText = "Transaction Successful";
+        let alertDiv = document.getElementById("error-messages");
+        alertDiv.innerText = "Login Successful";
         alertDiv.classList.remove("alert-danger");
         alertDiv.classList.add("alert-success")
         alertDiv.classList.remove("d-none")
@@ -115,6 +115,17 @@
       fetch('{{ .API }}/authenticate', requestOptions)
       .then((response) => response.json())
       .then((response) => {
+
+        if (response.error === false) {
+            localStorage.setItem("token_data", response.token.token)
+            localStorage.setItem("token_expiry", response.token.expiry)
+            showCardSuccess()
+
+            location.href="/"
+            
+        }else{
+            showCardError(response.message)
+        }
           console.log(response);
       })
     }

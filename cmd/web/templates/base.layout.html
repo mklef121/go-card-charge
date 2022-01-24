@@ -27,9 +27,7 @@
           <li class="nav-item">
             <a class="nav-link active" aria-current="page" href="/">Home</a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/virtual-terminal">Virtual Terminal</a>
-          </li>
+          
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
               aria-expanded="false">
@@ -41,10 +39,14 @@
 
             </ul>
           </li>
+
+          <li class="nav-item d-none" id="vt-link">
+            <a class="nav-link" href="/virtual-terminal">Virtual Terminal</a>
+          </li>
         </ul>
 
         <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-          <li class="nav-item">
+          <li class="nav-item d-none" id="login-link">
             <a class="nav-link" href="/login">Login</a>
           </li>
         </ul>
@@ -65,6 +67,58 @@
     integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
     crossorigin="anonymous"></script>
 
+  <script>
+    let vtLink = document.getElementById("vt-link");
+    let loginLink = document.getElementById("login-link");
+
+    document.addEventListener("DOMContentLoaded",() => {
+      // console.log(localStorage.getItem("jfjfhjfhj"));
+      if(localStorage.getItem("token_data") !== null){
+        loginLink.innerHTML = `<a class="nav-link" onclick="logOut()" href="#!">Logout</a>`
+        vtLink.classList.remove("d-none")
+      }else{
+        loginLink.innerHTML = `<a class="nav-link" href="/login">Login</a>`
+      }
+
+      loginLink.classList.remove("d-none")
+    })
+
+    function logOut(){
+      localStorage.removeItem("token_data")
+      localStorage.removeItem("token_expiry")
+
+      location.href = "/login"
+    }
+
+    function checkAuth(){
+      if(localStorage.getItem("token_data") == null){
+        location.href = "/login"
+      }else{
+        let token  = localStorage.getItem("token_data")
+        const headers = new Headers()
+
+        headers.append("Content-Type", "application/json")
+        headers.append("Authorization", "Bearer "+token)
+
+        let requestOptions = {
+        method: "post",
+        headers: headers,
+        // body: JSON.stringify(payload)
+      }
+
+      fetch('{{.API}}/is-authenticated',requestOptions)
+      .then((response) => response.json() )
+      .then((response) => {
+        if (response.error == true) {
+          console.log("not logged in");
+        }else{
+          console.log("logged In");
+        }
+      })
+      }
+
+    }
+  </script>
   {{block "js" .}} {{end}}
 </body>
 
