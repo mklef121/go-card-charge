@@ -28,6 +28,14 @@ func (app *application) loadApiRoutes() http.Handler {
 		chiRouter.Post("/authenticate", app.AuthenticateUser)
 		chiRouter.Post("/is-authenticated", app.CheckAuthentication)
 
+		chiRouter.Route("/admin", func(r chi.Router) {
+			r.Use(app.Auth)
+
+			r.Get("/test", func(rw http.ResponseWriter, r *http.Request) {
+				rw.Write([]byte("Just got in"))
+			})
+		})
+
 	})
 
 	router.Get("/me-u", app.GetPaymentIntent)

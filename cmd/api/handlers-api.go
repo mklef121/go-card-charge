@@ -2,9 +2,11 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/go-chi/chi/v5"
@@ -336,8 +338,49 @@ func (app *application) AuthenticateUser(writer http.ResponseWriter, request *ht
 	app.writeJson(writer, http.StatusOK, payload)
 }
 
-func (app *application) CheckAuthentication(writer http.ResponseWriter, request *http.Request) {
+func (app *application) authenticateToken(request *http.Request) (*models.User, error) {
 
-	app.invalidCredentials(writer)
+	authHeader := request.Header.Get("Authorization")
+
+	fmt.Println(authHeader, "The authheader")
+
+	if authHeader == "" {
+		return nil, errors.New("No authorization header received")
+	}
+
+	headParts := strings.Split(authHeader, " ")
+
+	if len(headParts) != 2 || headParts[0] != "Bearer" {
+		return nil, errors.New("No authorization header received.")
+	}
+
+	token := headParts[1]
+
+	if len(token) != 26 {
+		return nil, errors.New("Wrong size of authentication token.")
+	}
+
+	//Get the user from the tokens table
+	dbUser, err := app.DB.GetUserWithToken(token)
+
+	if err != nil {
+		return nil, errors.New("No matching user found.")
+	}
+	return dbUser, nil
+}
+
+func (app *application) CheckAuthentication(writer http.ResponseWriter, request *http.Request) {
+	user, err := app.authenticateToken(request)
+	if err != nil {
+		app.invalidCredentials(writer)
+		return
+	}
+
+	var res ApiMessage
+
+	res.Error = false
+	res.Message = fmt.Sprintf("Authenticated user %s", user.Email)
+
+	app.writeJson(writer, http.StatusOK, res)
 
 }
