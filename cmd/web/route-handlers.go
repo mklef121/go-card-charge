@@ -97,7 +97,7 @@ func (app *application) HomePage(writer http.ResponseWriter, r *http.Request) {
 
 func (app *application) VirtualTerminal(writer http.ResponseWriter, r *http.Request) {
 
-	if _, err := app.renderTemplate(writer, r, "terminal", &templateData{}, "stripe-js"); err != nil {
+	if _, err := app.renderTemplate(writer, r, "terminal", &templateData{}); err != nil {
 
 		app.errorLog.Println(err)
 	}

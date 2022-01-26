@@ -34,6 +34,8 @@ func (app *application) loadApiRoutes() http.Handler {
 			r.Get("/test", func(rw http.ResponseWriter, r *http.Request) {
 				rw.Write([]byte("Just got in"))
 			})
+
+			r.Post("/virtual-terminal-succeeded", app.VirtualTerminalPaymentSuccess)
 		})
 
 	})
