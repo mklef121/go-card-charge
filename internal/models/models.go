@@ -3,8 +3,11 @@ package models
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"strings"
 	"time"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 //Type for database connection values
@@ -288,4 +291,31 @@ func (model *DBModel) GetUserByEmail(email string) (User, error) {
 	}
 
 	return user, nil
+}
+
+func (model *DBModel) Authenticate(email, password string) (int, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	var id int
+	var passwordHash string
+
+	res := model.DB.QueryRowContext(ctx, `select id, password from users where email = ?`, email)
+
+	err := res.Scan(&id, &passwordHash)
+
+	if err != nil {
+		return id, err
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(passwordHash), []byte(password))
+
+	if err == bcrypt.ErrMismatchedHashAndPassword {
+
+		return 0, errors.New("Incorrect password")
+	} else if err != nil {
+		return 0, err
+	}
+
+	return id, nil
 }

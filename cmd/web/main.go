@@ -11,6 +11,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/alexedwards/scs/mysqlstore"
 	"github.com/alexedwards/scs/v2"
 	"github.com/mklef121/go-card-charge/driver"
 	"github.com/mklef121/go-card-charge/internal/models"
@@ -108,6 +109,7 @@ func main() {
 	// Initialize a new session manager and configure the session lifetime.
 	sessionManager = scs.New()
 	sessionManager.Lifetime = 24 * time.Hour
+	sessionManager.Store = mysqlstore.New(db)
 
 	tc := make(map[string]*template.Template)
 

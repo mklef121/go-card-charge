@@ -12,11 +12,17 @@ func (app *application) loadRoutes() http.Handler {
 
 	router.Use(SessionLoad)
 
-	router.Get("/", app.HomePage)
-	router.Get("/virtual-terminal", app.VirtualTerminal)
-	router.Get("/virtual-terminal-receipt", app.VirtualTerminalPaymentReciept)
+	router.Route("/admin", func(childRouter chi.Router) {
+		childRouter.Use(app.Auth)
 
-	router.Post("/virtual-terminal-payment-succeeded", app.VirtualTerminalPaymentSucceeded)
+		childRouter.Get("/virtual-terminal", app.VirtualTerminal)
+
+	})
+	router.Get("/", app.HomePage)
+
+	// router.Get("/virtual-terminal-receipt", app.VirtualTerminalPaymentReciept)
+
+	// router.Post("/virtual-terminal-payment-succeeded", app.VirtualTerminalPaymentSucceeded)
 
 	router.Post("/payment-succeeded", app.PaymentSucceeded)
 	router.Get("/widgets/{id}/charge-once", app.ChargeOnce)
@@ -27,6 +33,8 @@ func (app *application) loadRoutes() http.Handler {
 
 	//Auth pages
 	router.Get("/login", app.LoginPage)
+	router.Post("/login", app.PostLoginPage)
+	router.Get("/logout", app.Logout)
 
 	fileServer := http.FileServer(http.Dir("./static"))
 

@@ -322,3 +322,37 @@ func (app *application) LoginPage(writer http.ResponseWriter, request *http.Requ
 		return
 	}
 }
+
+func (app *application) PostLoginPage(writer http.ResponseWriter, request *http.Request) {
+	app.session.RenewToken(request.Context())
+
+	err := request.ParseForm()
+
+	if err != nil {
+		app.errorLog.Println(err)
+		return
+	}
+
+	email := request.Form.Get("email")
+	password := request.Form.Get("password")
+
+	id, err := app.DB.Authenticate(email, password)
+
+	if err != nil {
+		app.errorLog.Println(err)
+		http.Redirect(writer, request, "/login", http.StatusSeeOther)
+		return
+	}
+
+	app.session.Put(request.Context(), "userID", id)
+
+	http.Redirect(writer, request, "/", http.StatusSeeOther)
+}
+
+func (app *application) Logout(writer http.ResponseWriter, request *http.Request) {
+
+	app.session.Destroy(request.Context())
+	app.session.RenewToken(request.Context())
+
+	http.Redirect(writer, request, "/login", http.StatusSeeOther)
+}

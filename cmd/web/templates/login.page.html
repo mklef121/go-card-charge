@@ -3,7 +3,7 @@
 {{define "title"}} Login {{end}}
 
 {{define "body"}}
-<form method="post" action="" id="login_form" class="d-block needs-validation charge-form" autocomplete="off"
+<form method="post" action="/login" id="login_form" class="d-block needs-validation charge-form" autocomplete="off"
     novalidate="">
 
 
@@ -24,7 +24,7 @@
 
     <div class="mb-3">
         <label for="password" class="form-label text-primary"> Password</label>
-        <input type="password" id="password" class="form-control" autocomplete="password-new" name="cardholder_name"
+        <input type="password" id="password" class="form-control" autocomplete="password-new" name="password"
             required />
     </div>
 
@@ -121,7 +121,9 @@
             localStorage.setItem("token_expiry", response.token.expiry)
             showCardSuccess()
 
-            location.href="/"
+            // location.href="/"
+
+            document.getElementById("login_form").submit()
             
         }else{
             showCardError(response.message)
