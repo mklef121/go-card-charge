@@ -356,3 +356,11 @@ func (app *application) Logout(writer http.ResponseWriter, request *http.Request
 
 	http.Redirect(writer, request, "/login", http.StatusSeeOther)
 }
+
+func (app *application) ForgotPassword(writer http.ResponseWriter, request *http.Request) {
+	_, err := app.renderTemplate(writer, request, "forgot-password", nil)
+	if err != nil {
+		app.errorLog.Println(err)
+		return
+	}
+}

@@ -4,3 +4,7 @@ tmp
 #soda generate fizz AddImageToWidget
 #soda migrate
 #soda generate sql CreateSessionsTable
+# "MAIL_HOST":"smtp.gmail.com",
+#     "MAIL_PORT":"587",
+#     "MAIL_USERNAME":"vsamfinvest1@gmail.com",
+#     "MAIL_PASSWORD":"#Blessing02"

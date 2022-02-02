@@ -17,7 +17,11 @@
       "NODE_ENV": "development",
       "STRIPE_SECRET_KEY": "sk_test_51K9EbQGqDIpyXgT2kcIX0udBQZbMBDxVczHp82MKGdeyNfAkJeEJSNErxxhbRxLHw6MGgitfIcB8QTCaXJit6AZf001cuf1AeV",
       "STRIPE_KEY":"pk_test_51K9EbQGqDIpyXgT2X3ajKjIGL9gHJJ4pLK6MOna1vNlohZkTezgYVch9zxTXndmhcSwgWxXoiJsTCF3KgUHJBEPO00W99eICd1",
-      "DATABASE_DSN":"root:password@tcp(127.0.0.1:3306)/stripe_app?parseTime=true"
+      "DATABASE_DSN":"root:password@tcp(127.0.0.1:3306)/stripe_app?parseTime=true",
+      "MAIL_HOST":"smtp.mailtrap.io",
+      "MAIL_PORT":"587",
+      "MAIL_USERNAME":"61920939795536",
+      "MAIL_PASSWORD":"67b79f7ce1452c"
     },
     "ext": "js,json,go,tpl,tmpl,html,gohtml",
     "signal":"SIGTERM"

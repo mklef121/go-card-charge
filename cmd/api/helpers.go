@@ -46,14 +46,22 @@ func (app *application) badRequest(writer http.ResponseWriter, err error) error 
 	out, err := json.MarshalIndent(payload, "", "\t")
 
 	if err != nil {
+		app.errorLog.Println(err)
+		writeOutError(writer, []byte(err.Error()))
 		return err
 	}
 
+	app.errorLog.Println("Writing shit", string(out))
+
+	writeOutError(writer, out)
+
+	return nil
+}
+
+func writeOutError(writer http.ResponseWriter, out []byte) {
 	writer.Header().Set("Content-Type", "application/json")
 	writer.WriteHeader(http.StatusBadRequest)
 	writer.Write(out)
-
-	return nil
 }
 
 //Writes data out as Json

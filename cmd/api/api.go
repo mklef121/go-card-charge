@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/mklef121/go-card-charge/driver"
@@ -28,6 +29,14 @@ type Config struct {
 	stripe struct {
 		secret string
 		pubKey string
+	}
+
+	//email config
+	smtp struct {
+		host     string
+		port     int
+		username string
+		password string
 	}
 }
 
@@ -78,6 +87,11 @@ func main() {
 	appConfig.stripe.secret = os.Getenv("STRIPE_SECRET_KEY")
 	appConfig.stripe.pubKey = os.Getenv("STRIPE_KEY")
 	appConfig.db.dsn = os.Getenv("DATABASE_DSN")
+
+	appConfig.smtp.host = os.Getenv("MAIL_HOST")
+	appConfig.smtp.port, _ = strconv.Atoi(os.Getenv("MAIL_PORT"))
+	appConfig.smtp.username = os.Getenv("MAIL_USERNAME")
+	appConfig.smtp.password = os.Getenv("MAIL_PASSWORD")
 
 	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
 	errorLog := log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)

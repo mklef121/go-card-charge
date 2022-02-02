@@ -451,3 +451,40 @@ func (app *application) VirtualTerminalPaymentSuccess(writer http.ResponseWriter
 
 	app.writeJson(writer, http.StatusOK, txn)
 }
+
+func (app *application) SendPasswordResetEmail(writer http.ResponseWriter, request *http.Request) {
+	var payload struct {
+		Email string `json:"email"`
+	}
+
+	err := app.readJson(writer, request, &payload)
+
+	if err != nil {
+		app.badRequest(writer, err)
+		return
+	}
+
+	var data struct {
+		Link string
+	}
+
+	data.Link = "http://example.com"
+
+	//send email
+	err = app.SendMail("info@widget.com", "info@widget.com", "Password Reset", "password-reset", data)
+
+	if err != nil {
+
+		app.infoLog.Println(err, "Got feedback")
+		app.badRequest(writer, err)
+		return
+	}
+
+	var res ApiMessage
+
+	res.Error = false
+	res.Message = "Password reset email sent successfully "
+
+	app.writeJson(writer, http.StatusCreated, res)
+
+}

@@ -27,6 +27,7 @@ func (app *application) loadApiRoutes() http.Handler {
 		chiRouter.Post("/create-customer-and-subscribe", app.CreateCustomerAndSubscribe)
 		chiRouter.Post("/authenticate", app.AuthenticateUser)
 		chiRouter.Post("/is-authenticated", app.CheckAuthentication)
+		chiRouter.Post("/forgot-password", app.SendPasswordResetEmail)
 
 		chiRouter.Route("/admin", func(r chi.Router) {
 			r.Use(app.Auth)
